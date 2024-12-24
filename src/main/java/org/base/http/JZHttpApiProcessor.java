@@ -78,8 +78,8 @@ public class JZHttpApiProcessor implements HttpApiProcessor<JZHttpApi> {
      *
      * @param bodyResult   Http响应体反序列化后的结果
      * @param rsp          原始Http响应对象
-     * @param method       被代理的方法
-     * @param httpMetadata Http请求体
+     * @param httpMetadata       被代理的方法
+     * @param methodInvocation Http请求体
      */
     @Override
     public Object postAfterHttpResponseBodyResult(Object bodyResult, HttpResponse<?> rsp, HttpMetadata httpMetadata, HttpApiMethodInvocation<JZHttpApi> methodInvocation) {
