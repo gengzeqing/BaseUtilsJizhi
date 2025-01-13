@@ -4,6 +4,7 @@ import com.burukeyou.uniapi.annotation.UniAPIScan;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.Environment;
 
@@ -15,7 +16,7 @@ import java.net.UnknownHostException;
  */
 @Slf4j
 @UniAPIScan("org.base.http.service")
-@SpringBootApplication
+@SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
 public class BaseUtilsJizhiApplication {
     public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext application = SpringApplication.run(BaseUtilsJizhiApplication.class, args);

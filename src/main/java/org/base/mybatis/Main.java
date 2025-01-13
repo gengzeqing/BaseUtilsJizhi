@@ -39,11 +39,7 @@ public class Main implements IService<WorkflowChannelApplyNodeVo> {
                 eq(name != null, "LEVEL_NODE", name).
                 eq("STATUS", "测试").
                 select("select MAX(ID) FROM TB_WORKFLOW_APPLY_NODE ");
-        Map<String, Object> paramNameValuePairs = select.getParamNameValuePairs();
-        String sqlSegment = select.getCustomSqlSegment();
-        String sqlSelect = select.getSqlSelect();
-
-        String sql = sqlSelect + Utils.replaceSqlPlaceholders(sqlSegment, paramNameValuePairs);
+        String sql =  Utils.replaceSqlPlaceholders(select);
         System.out.println(sql);
 
         /**

@@ -14,7 +14,7 @@ public class Main {
 
         // 创建变更后的对象
         License newLicense = new License();
-        newLicense.setLicenseName("合作商B");
+        newLicense.setLicenseName("合作商A");
         newLicense.setLicenseCode("00126");
        // newLicense.setActivityType(1);  // 火车
         newLicense.setLicenseType(1);  // 个人许可证

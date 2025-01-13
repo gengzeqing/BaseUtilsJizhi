@@ -203,11 +203,17 @@
             <version>23.0</version>
         </dependency>
 
+<!--        <dependency>-->
+<!--            <groupId>com.oracle.database.jdbc</groupId>-->
+<!--            <artifactId>ojdbc8</artifactId>-->
+<!--            <version>18.15.0.0</version>&lt;!&ndash;$NO-MVN-MAN-VER$&ndash;&gt;-->
+<!--        </dependency>-->
+
         <dependency>
-            <groupId>com.oracle.database.jdbc</groupId>
-            <artifactId>ojdbc8</artifactId>
-            <version>18.15.0.0</version><!--$NO-MVN-MAN-VER$-->
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
         </dependency>
+
         <!-- 百度OCR -->
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>

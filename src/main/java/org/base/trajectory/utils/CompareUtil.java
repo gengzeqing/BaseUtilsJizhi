@@ -5,6 +5,8 @@ import org.base.trajectory.annotation.EnumField;
 import org.base.trajectory.annotation.FieldDescription;
 
 import java.lang.reflect.Field;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -130,5 +132,21 @@ public class CompareUtil {
     private static String getObjectValue(Object obj) {
         // 如果对象为空或者对象的值为"null"，则返回空字符串
         return obj == null || Objects.equals(obj, "null") ? "" : obj.toString();
+    }
+
+    public static void main(String[] args) {
+        String deadline2 = "2025-01-09";
+
+        // 使用 LocalDate 解析字符串并比较
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date1 = LocalDate.now();
+        LocalDate date2 = LocalDate.parse(deadline2, formatter);
+
+        // 判断 deadline2 是否大于 deadline1
+        if (!date2.isAfter(date1)) {
+            System.out.println("截止时间不能小于当前时间");
+        }else {
+            System.out.println("大");
+        }
     }
 }

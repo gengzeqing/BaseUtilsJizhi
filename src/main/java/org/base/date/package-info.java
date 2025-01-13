@@ -15,4 +15,7 @@ package org.base.date;
  *
  * daysToReachTargetWorkingDate 计算指定日期 几天 后的工作日
  *
+ * 两个日期类型 相减 得到 天数
+ * long between = ChronoUnit.DAYS.between(LocalDate.parse(li.getDeadline()), now);
+ *
  */
