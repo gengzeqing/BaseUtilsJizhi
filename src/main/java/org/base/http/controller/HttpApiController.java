@@ -1,5 +1,6 @@
 package org.base.http.controller;
 
+
 import com.alibaba.fastjson2.JSON;
 import com.burukeyou.uniapi.http.core.response.HttpFileResponse;
 import com.burukeyou.uniapi.http.core.response.HttpJsonResponse;
@@ -16,9 +17,11 @@ import org.base.http.service.TableService;
 import org.base.http.service.WeatherHttpApiService;
 import org.base.http.vo.DataVo;
 import org.base.http.vo.HolidayVoReq;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONArray;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -131,7 +134,7 @@ public class HttpApiController {
      * @return
      */
     @PostMapping("/api/getHoliday")
-    private String getHoliday() {
+    private String getHoliday() throws JSONException {
         AtomicLong count = new AtomicLong(1L);
         HolidayVoReq holidayVo = new HolidayVoReq();
         holidayVo.setDate("2024-01-01");
@@ -168,7 +171,7 @@ public class HttpApiController {
             String holidayDate = holidayObj.getString("holiday");
             String name = holidayObj.getString("name");
             String vacation = holidayObj.getString("vacation");
-            String remark = holidayObj.optString("remark");
+            String remark = holidayObj.getString("remark");
             String wage = holidayObj.getString("wage");
             String tip = holidayObj.getString("tip");
             String rest = holidayObj.getString("rest");

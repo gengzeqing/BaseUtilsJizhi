@@ -1,6 +1,5 @@
 package org.base.pdf;
 
-import cn.hutool.core.util.StrUtil;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.pdf.BaseFont;
 import freemarker.template.Configuration;
@@ -73,7 +72,7 @@ public class PdfUtil {
 
             // 保存PDF到服务器路径
             String fileId = StringUtils.getKey("1.pdf");
-            if (StrUtil.isEmpty(fileId)) {
+            if (StringUtils.isEmpty(fileId)) {
                 throw new RuntimeException("文件名不合法");
             } else {
                 fileId = System.currentTimeMillis() + fileId;
@@ -145,7 +144,7 @@ public class PdfUtil {
 
             // 保存PDF到服务器路径
             String fileId = StringUtils.getKey("1.pdf");
-            if (StrUtil.isEmpty(fileId)) {
+            if (StringUtils.isEmpty(fileId)) {
                 throw new RuntimeException("文件名不合法");
             } else {
                 fileId = System.currentTimeMillis() + fileId;

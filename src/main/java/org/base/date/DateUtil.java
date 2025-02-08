@@ -1,6 +1,7 @@
 package org.base.date;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import lombok.RequiredArgsConstructor;
 import org.base.date.vo.HolidayVo;
 import org.base.http.mapper.HolidayMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,10 @@ import java.util.Set;
  * @author 耿
  */
 @Component(value = "dateUtil")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class DateUtil {
 
-    @Autowired
-    private HolidayMapper holidayMapper;
+    private final HolidayMapper holidayMapper;
 
     /**
      * @param date 时间

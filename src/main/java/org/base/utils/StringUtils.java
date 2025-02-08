@@ -1,7 +1,5 @@
 package org.base.utils;
 
-import cn.hutool.extra.pinyin.PinyinUtil;
-
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -166,9 +164,6 @@ public class StringUtils {
         return dft.format(date);
     }
 
-    public static void main(String[] args) {
-        System.out.println(getNamePinyin("白"));
-    }
 
     /**
      * @Description 昨天
@@ -262,16 +257,6 @@ public class StringUtils {
         return time.getTimeInMillis() / 1000;
     }
 
-    public static String getNamePinyin(String name) {
-        if (isEmpty(name)) {
-            return null;
-        }
-        if (name.length() == 1) {
-            return PinyinUtil.getPinyin(name);
-        } else {
-            return (PinyinUtil.getPinyin(name.substring(0, 1)) + "." + PinyinUtil.getPinyin(name.substring(1))).replaceAll(" ", "");
-        }
-    }
 
 
 }
