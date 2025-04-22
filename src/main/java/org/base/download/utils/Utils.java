@@ -31,5 +31,17 @@ public class Utils {
         return outputStream;
     }
 
+    // 获取 URL 中的文件扩展名
+    public static String getUrlFileType(String fileUrl) {
+        if (fileUrl == null || fileUrl.isEmpty()) {
+            return "";
+        }
+        int dotIndex = fileUrl.lastIndexOf(".");
+        if (dotIndex > 0 && dotIndex < fileUrl.length()) {
+            return fileUrl.substring(dotIndex + 1);
+        }
+        return "";
+    }
+
 
 }

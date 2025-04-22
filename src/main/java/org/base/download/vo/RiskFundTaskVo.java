@@ -37,6 +37,7 @@ public class RiskFundTaskVo {
      * 合作商CODE
      */
     private String partnerCode;
+    private String num;
 
     /**
      * 补缴退还类型

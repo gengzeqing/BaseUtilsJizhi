@@ -4,8 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
+import org.base.download.utils.Utils;
 import org.base.download.vo.ImageData;
 import org.base.download.vo.RiskFundTaskVo;
+import org.base.error.ParamException;
+import org.base.http.vo.UrlFileVo;
+import org.base.utils.PropertiesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,11 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+import java.io.File;
 import java.io.OutputStream;
-import java.net.URL;
 import java.net.URLEncoder;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -58,12 +67,16 @@ public class Download1Controller {
         records.add(fundTaskVo);
         records.add(fundTaskVo1);
         Map<Integer, List<RiskFundTaskVo>> listMap = records.stream().collect(Collectors.groupingBy(RiskFundTaskVo::getPartnerId));
-        downloadImages(listMap,response);
+        downloadImages(listMap, response);
 
     }
 
     @SneakyThrows
-    private void downloadImages(Map<Integer, List<RiskFundTaskVo>> listMap,HttpServletResponse response) {
+    private void downloadImages(Map<Integer, List<RiskFundTaskVo>> listMap, HttpServletResponse response) {
+
+        if (CollectionUtils.isEmpty(listMap)) {
+            throw new ParamException("无可下载资源");
+        }
 
         ExecutorService executor = Executors.newFixedThreadPool(5);
         List<Future<ImageData>> futures = new ArrayList<>();
@@ -81,8 +94,13 @@ public class Download1Controller {
 
                 // 处理每个任务
                 for (RiskFundTaskVo taskVo : taskVos) {
-                    String processNumber = taskVo.getProcessNumber();
-                    List<String> imageUrls = Arrays.stream(taskVo.getImageUrl().split(",")).collect(Collectors.toList());
+                    String num = taskVo.getNum();
+                    List<UrlFileVo> voucherUrls = UrlFileVo.getFileList(taskVo.getRemittanceVoucherUrl());
+                    if (CollectionUtils.isEmpty(voucherUrls)) continue;
+
+                    List<String> imageUrls = voucherUrls.stream()
+                            .map(UrlFileVo::getFileId)
+                            .collect(Collectors.toList());
 
                     // ✅ 每个任务使用独立的计数器
                     AtomicInteger count = new AtomicInteger(1);
@@ -91,24 +109,17 @@ public class Download1Controller {
                     for (String imageUrl : imageUrls) {
                         futures.add(executor.submit(() -> {
                             try {
+                                String outputFilePath = PropertiesUtil.getFile_path() + File.separator + imageUrl;
+                                Path path = Paths.get(outputFilePath);
+                                byte[] fileBytes = Files.readAllBytes(path);
                                 // 下载图片数据
-                                URL url = new URL(imageUrl);
-                                String fileName = url.getFile().substring(url.getFile().lastIndexOf('/') + 1);
-                                String fileExtension = fileName.contains(".")
-                                        ? fileName.substring(fileName.lastIndexOf(".") + 1)
-                                        : "dat";
-
-                                try (InputStream is = url.openStream();
-                                     ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
-                                    byte[] dataBlock = new byte[4096];
-                                    int bytesRead;
-                                    while ((bytesRead = is.read(dataBlock)) != -1) {
-                                        buffer.write(dataBlock, 0, bytesRead);
-                                    }
-
+                                String fileExtension = Utils.getUrlFileType(imageUrl);
+                                try (
+                                        ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+                                    buffer.write(fileBytes);
                                     // ✅ 使用原子递增确保序号唯一
                                     return new ImageData(
-                                            processNumber,
+                                            num,
                                             partnerName,
                                             buffer.toByteArray(),
                                             fileExtension,
@@ -129,7 +140,7 @@ public class Download1Controller {
                 ImageData data = future.get();
                 if (data == null) continue;
 
-                String zipEntryName = data.getProcessNumber() + "-" + data.getPartnerName() + "-" + data.getCount() + "."
+                String zipEntryName = data.getNum() + "-" + data.getPartnerName() + "-" + data.getCount() + "."
                         + data.getFileExtension();
 
                 zos.putNextEntry(new ZipEntry(zipEntryName));
