@@ -183,6 +183,51 @@ public class DateUtil {
         return date.format(formatter);
     }
 
+
+    /**
+     *
+     * @param currentDate 开始工作日
+     * @param targetDate  截止工作日
+     * @return 剩余工作日
+     */
+    public long getRemainingWorkingDays(LocalDate currentDate, LocalDate targetDate) {
+        if (targetDate.isBefore(currentDate) || targetDate.isEqual(currentDate)) {
+            return 0;
+        }
+
+        // 获取节假日和补班数据
+        List<HolidayVo> holidays = holidayMapper.selectList(new QueryWrapper<HolidayVo>().eq("status", 1));
+        Set<LocalDate> holidaySet = new HashSet<>();
+        Set<LocalDate> workdaySet = new HashSet<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        for (HolidayVo holiday : holidays) {
+            LocalDate date = LocalDate.parse(holiday.getHolidayDate(), formatter);
+            if ("Y".equals(holiday.getHoliday())) {
+                holidaySet.add(date);
+            } else {
+                workdaySet.add(date);
+            }
+        }
+
+        long count = 0;
+        LocalDate date = currentDate.plusDays(1); // 从当前日期的下一天开始计算
+
+        while (!date.isAfter(targetDate)) { // 包括目标日期
+            boolean isWeekday = date.getDayOfWeek().getValue() >= DayOfWeek.MONDAY.getValue()
+                    && date.getDayOfWeek().getValue() <= DayOfWeek.FRIDAY.getValue();
+            boolean isHoliday = holidaySet.contains(date);
+            boolean isWorkday = workdaySet.contains(date);
+
+            if ((isWeekday && !isHoliday) || isWorkday) {
+                count++;
+            }
+            date = date.plusDays(1);
+        }
+        return count;
+    }
+
+
     /**
      * 判断给定日期是否为工作日
      *
