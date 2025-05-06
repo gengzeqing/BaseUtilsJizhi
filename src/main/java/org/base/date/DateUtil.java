@@ -187,7 +187,7 @@ public class DateUtil {
     /**
      *
      * @param currentDate 开始工作日
-     * @param targetDate  截止工作日
+     * @param targetDate  截止工作日 超过他 会返回 0
      * @return 剩余工作日
      */
     public long getRemainingWorkingDays(LocalDate currentDate, LocalDate targetDate) {
@@ -236,6 +236,67 @@ public class DateUtil {
      */
     private boolean isWeekday(LocalDate date) {
         return !("SATURDAY".equals(date.getDayOfWeek().toString()) || "SUNDAY".equals(date.getDayOfWeek().toString()));
+    }
+
+
+    /**
+     *
+     * @param currentDate
+     * @param targetDate 超过他 会返回 负数
+     * @return
+     */
+    public long getRemainingWorkingDaysTwo(LocalDate currentDate, LocalDate targetDate) {
+        if (currentDate.equals(targetDate)) {
+            return 0; // 相同日期直接返回0
+        }
+
+        // 获取节假日和补班日数据
+        List<HolidayVo> holidays = holidayMapper.selectList(new QueryWrapper<HolidayVo>().eq("status", 1));
+        Set<LocalDate> holidaySet = new HashSet<>();
+        Set<LocalDate> workdaySet = new HashSet<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // 填充节假日和补班日集合
+        for (HolidayVo holiday : holidays) {
+            LocalDate date = LocalDate.parse(holiday.getHolidayDate(), formatter);
+            if ("Y".equals(holiday.getHoliday())) {
+                holidaySet.add(date);
+            } else {
+                workdaySet.add(date);
+            }
+        }
+
+        // 定义日期范围和符号
+        LocalDate start, end;
+        int sign = 1;
+
+        if (currentDate.isBefore(targetDate)) {
+            // currentDate早于targetDate：计算剩余天数（正数）
+            start = currentDate.plusDays(1);
+            end = targetDate;
+        } else {
+            // currentDate晚于targetDate：计算超出的天数（负数）
+            start = targetDate.plusDays(1);
+            end = currentDate;
+            sign = -1;
+        }
+
+        // 遍历日期范围并统计工作日
+        long count = 0;
+        LocalDate date = start;
+        while (!date.isAfter(end)) { // 包含结束日期
+            boolean isWeekday = date.getDayOfWeek().getValue() <= 5; // 周一到周五
+            boolean isHoliday = holidaySet.contains(date);
+            boolean isWorkday = workdaySet.contains(date);
+
+            // 判断是否为有效工作日
+            if ((isWeekday && !isHoliday) || isWorkday) {
+                count++;
+            }
+            date = date.plusDays(1);
+        }
+
+        return count * sign; // 根据顺序返回正负值
     }
 
 }
