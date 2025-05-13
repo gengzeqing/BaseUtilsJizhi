@@ -37,6 +37,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
+ * @description: 多个图片地址，下载 并打包成压缩包
  * @author 耿
  */
 @Slf4j
