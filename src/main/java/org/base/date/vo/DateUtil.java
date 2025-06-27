@@ -1,8 +1,7 @@
-package org.base.date;
+package org.base.date.vo;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
-import org.base.date.vo.HolidayVo;
 import org.base.http.mapper.HolidayMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

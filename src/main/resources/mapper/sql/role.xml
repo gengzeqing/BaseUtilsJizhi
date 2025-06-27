@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.base.role.mapper.RoleMapper">
+
+    <!-- 查询功能列表条件 -->
+    <sql id="queryFuncCondition">
+        <choose>
+            <when test="roleId !=null and roleId!=''">
+                ,CASE WHEN
+                (SELECT MAX(rf.checked) as checked FROM fl_role_func_map rf WHERE rf.role_id = #{roleId} AND rf.func_id = t.id GROUP BY rf.func_id) IS NULL THEN -1
+                ELSE (SELECT MAX(rf.checked) as checked FROM fl_role_func_map rf WHERE rf.role_id = #{roleId} AND rf.func_id = t.id GROUP BY rf.func_id)
+                END AS checked
+            </when>
+            <otherwise>
+                ,-1 AS checked
+            </otherwise>
+        </choose>
+    </sql>
+
+    <select id="getFunctionTree" resultType="org.base.role.vo.FunctionVo">
+        select t.id, t.name, t.level_type, t.parent_id, t.description
+        <include refid="queryFuncCondition"/>
+        from fl_function t
+        where t.status != 0
+        order by t.level_type, t.orderby
+    </select>
+
+
+    <select id="getMenuList" resultType="org.base.role.vo.KeyValueVo">
+        SELECT c.NAME as menu_name,p.CODE as menuCode,c.LINK_TYPE
+        FROM
+            (SELECT ROLE_ID,MAX(USER_ID) AS USER_ID  FROM FL_USER_ROLE_MAP WHERE USER_ID=#{userId} GROUP BY ROLE_ID)a
+                LEFT JOIN FL_ROLE_FUNC_MAP rf ON rf.ROLE_ID=a.ROLE_ID
+                LEFT JOIN FL_FUNCTION c on c.ID=rf.FUNC_ID
+                LEFT JOIN FL_PRIVILEGE p on p.FUNC_ID=c.ID
+        WHERE p.code is not null
+    </select>
+
+    <select id="allCode" resultType="org.base.role.vo.KeyValueVo">
+        SELECT p.CODE as menuCode,p.URI as name,id
+        FROM FL_PRIVILEGE p
+        WHERE p.uri is not null
+    </select>
+
+
+
+
+
+
+
+
+
+
+    <select id="selectEmpIdByRoleCode" resultType="java.lang.Integer">
+        SELECT
+            e.id
+        FROM
+            TB_EMPLOYEE e
+            LEFT JOIN FL_USER_ROLE_MAP u ON e.id = u.USER_ID
+            LEFT JOIN FL_ROLE r ON u.ROLE_ID = r.id
+        WHERE
+            r.ID = #{roleId}
+    </select>
+
+
+
+</mapper>
